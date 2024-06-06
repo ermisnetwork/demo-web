@@ -5,6 +5,7 @@ import { UpdateIsLoading, showSnackbar } from './app';
 import { client } from '../../client';
 import axiosWalletInstance from '../../utils/axiosWallet';
 import { OpenDialogProfile } from './dialog';
+import { jwtDecode } from 'jwt-decode';
 
 // ----------------------------------------------------------------------
 
@@ -69,6 +70,44 @@ export function LoginUser(formValues) {
       })
       .catch(function (error) {
         dispatch(showSnackbar({ severity: 'error', message: error.message }));
+        dispatch(UpdateIsLoading({ isLoading: false }));
+      });
+  };
+}
+
+export function LoginUserByGoogle(token) {
+  return async (dispatch, getState) => {
+    // Make API call here
+    dispatch(UpdateIsLoading({ isLoading: true }));
+
+    await axiosWalletInstance
+      .post('/auth/google', { token })
+      .then(async function (response) {
+        const token = response.data.token;
+        const decoded = jwtDecode(token);
+        const userId = decoded && decoded.user_id ? decoded.user_id.toLowerCase() : '';
+
+        dispatch(
+          slice.actions.logIn({
+            isLoggedIn: true,
+            token: token,
+            user_id: userId,
+            isLoginWallet: false,
+          }),
+        );
+        window.localStorage.setItem('user_id', userId);
+        dispatch(UpdateIsLoading({ isLoading: false }));
+
+        const userInfo = await fetchUserFirst(userId, token);
+        if (userInfo.name === userId) {
+          // show dialog update user
+          setTimeout(() => {
+            dispatch(OpenDialogProfile());
+          }, 500);
+        }
+      })
+      .catch(function (error) {
+        dispatch(showSnackbar({ severity: 'error', message: error.message || 'Something went wrong' }));
         dispatch(UpdateIsLoading({ isLoading: false }));
       });
   };

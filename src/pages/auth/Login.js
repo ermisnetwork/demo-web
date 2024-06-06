@@ -5,8 +5,10 @@ import { useCallback, useEffect, useState } from 'react';
 import axiosWalletInstance from '../../utils/axiosWallet';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { LoginUserByWallet } from '../../redux/slices/auth';
+import { LoginUserByGoogle, LoginUserByWallet } from '../../redux/slices/auth';
 import { showSnackbar } from '../../redux/slices/app';
+import { GoogleLogin } from '@react-oauth/google';
+
 // ----------------------------------------------------------------------
 
 export default function LoginPage() {
@@ -100,17 +102,17 @@ export default function LoginPage() {
   return (
     <>
       <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
-        <Typography variant="h4">Login to Ermis</Typography>
-
-        {/* <Stack direction="row" spacing={0.5}>
-          <Typography variant="body2">New user?</Typography>
-          <Link to={'/auth/register'} component={RouterLink} variant="subtitle2">
-            Create an account
-          </Link>
-        </Stack> */}
+        <Typography variant="h4">Login to Caduceus</Typography>
       </Stack>
-      {/* <Login /> */}
-      {/* <Divider>or</Divider> */}
+      <GoogleLogin
+        onSuccess={credentialResponse => {
+          dispatch(LoginUserByGoogle(credentialResponse.credential));
+        }}
+        onError={error => {
+          dispatch(showSnackbar({ severity: 'error', message: error.message || 'Something went wrong' }));
+        }}
+      />
+
       <LoadingButton
         fullWidth
         color="inherit"

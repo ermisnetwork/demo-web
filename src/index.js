@@ -10,6 +10,7 @@ import { WagmiProvider } from 'wagmi';
 import { Buffer } from 'buffer';
 import { createWeb3Modal } from '@web3modal/wagmi/react';
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // contexts
 import SettingsProvider from './contexts/SettingsContext';
@@ -35,19 +36,21 @@ createWeb3Modal({ wagmiConfig, projectId, chains });
 
 root.render(
   <React.StrictMode>
-    <WagmiProvider config={wagmiConfig}>
-      <HelmetProvider>
-        <ReduxProvider store={store}>
-          <SettingsProvider>
-            <BrowserRouter>
-              <QueryClientProvider client={queryClient}>
-                <App />
-              </QueryClientProvider>
-            </BrowserRouter>
-          </SettingsProvider>
-        </ReduxProvider>
-      </HelmetProvider>
-    </WagmiProvider>
+    <GoogleOAuthProvider clientId="627177543690-6auhc93esd9crfb741ejf7guc5gg0787.apps.googleusercontent.com">
+      <WagmiProvider config={wagmiConfig}>
+        <HelmetProvider>
+          <ReduxProvider store={store}>
+            <SettingsProvider>
+              <BrowserRouter>
+                <QueryClientProvider client={queryClient}>
+                  <App />
+                </QueryClientProvider>
+              </BrowserRouter>
+            </SettingsProvider>
+          </ReduxProvider>
+        </HelmetProvider>
+      </WagmiProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>,
 );
 
